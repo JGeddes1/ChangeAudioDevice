@@ -7,6 +7,8 @@ using System.Threading;
 
 class Program
 {
+
+
     static void Main()
     {
         ChangeDefaultPlaybackDevice();
@@ -19,7 +21,7 @@ class Program
 
         // Set up global hotkey for Ctrl+N
         var inputSimulator = new InputSimulator();
-        var hotkey = "^N"; // Ctrl+N
+        // var hotkey = "^N"; // Ctrl+N
 
         // Get a list of all playback devices
         var playbackDevices = controller.GetDevices(DeviceType.Playback, DeviceState.Active);
@@ -30,7 +32,7 @@ class Program
         var filteredDevices = playbackDevices
             .Where(device => device.FullName.Contains("Speakers") || device.FullName.Contains("Headset"))
             .ToList();
-
+        // Little if statement to see devices 
         for (int i = 0; i < filteredDevices.Count; i++)
         {
             var device = filteredDevices[i];
@@ -40,8 +42,9 @@ class Program
         // Check if there are at least two suitable playback devices
         if (filteredDevices.Count() >= 2)
         {
-            // Initialize an index to keep track of the current device
-            int currentIndex = 0;
+        
+            // Find the index of the current default playback device in the filtered list
+            int currentIndex = filteredDevices.FindIndex(device => device.Equals(controller.DefaultPlaybackDevice));
 
             // Use a boolean flag to allow graceful exit
             bool exitFlag = false;
@@ -51,7 +54,7 @@ class Program
             {
                 // Check for the hotkey combination
                 if (inputSimulator.InputDeviceState.IsKeyDown(WindowsInput.Native.VirtualKeyCode.CONTROL) &&
-                    inputSimulator.InputDeviceState.IsKeyDown(WindowsInput.Native.VirtualKeyCode.VK_N))
+                    inputSimulator.InputDeviceState.IsKeyDown(WindowsInput.Native.VirtualKeyCode.VK_N)&& inputSimulator.InputDeviceState.IsKeyDown(WindowsInput.Native.VirtualKeyCode.MENU))
                 {
                     // Get the current default playback device
                     var currentPlaybackDevice = controller.DefaultPlaybackDevice;
@@ -75,10 +78,10 @@ class Program
                     currentIndex = nextIndex;
 
                     // Sleep to avoid continuous hotkey triggering
-                    Thread.Sleep(2000);
+                    Thread.Sleep(300);
                 }
 
-                // You can add additional conditions here for other actions or exit criteria
+ 
 
                 // Sleep to avoid high CPU usage in the loop
                 Thread.Sleep(100);
